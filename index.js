@@ -4,7 +4,7 @@ const cors = require("cors");
 
 require("dotenv").config();
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 7000;
 
 const app = express();
@@ -34,14 +34,24 @@ async function run() {
     // getting products based on specific category
 
     app.get("/officeproducts", async (req, res) => {
-      const categories = req.query.category;
-      console.log(categories);
+      const category = req.query.category;
+      console.log(category);
 
-      const query = { categories };
+      const query = { category };
 
       const cursor = officecategoryproducts.find(query);
       const officeproducts = await cursor.toArray();
       res.send(officeproducts);
+
+      // getting single products
+
+      app.get("/products/find/:id", async (req, res) => {
+        const id = req.params.id;
+
+        const query = { _id: ObjectId(id) };
+        const order = await officecategoryproducts.findOne(query);
+        res.send(order);
+      });
     });
   } catch (err) {}
 }
